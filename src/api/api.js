@@ -1,9 +1,19 @@
+let apikey = ''
+
+async function _fetch(url){
+    let headers = {}
+    if (apikey) {
+        headers['authorization'] = `token ${apikey}`
+    }
+    return fetch(url, {headers: headers})
+}
+
 async function fetch_all_pages(url){
     let vaiindo = true
     let result = []
     let page = 1
     while(vaiindo){
-        const response = await fetch(`${url}?page=${page}`)
+        const response = await _fetch(`${url}?page=${page}`)
         const tmpitems = await response.json()
         if(tmpitems.length > 0){
             result = result.concat(tmpitems)
@@ -16,9 +26,13 @@ async function fetch_all_pages(url){
 }
 
 export const api = {
+    set_apikey(k){
+        apikey = k
+        console.log()
+    },
     async search_users(searchstring){
         const url = `https://api.github.com/search/users?q=${searchstring}`
-        const response = await fetch(url)
+        const response = await _fetch(url)
         return await response.json()
     },
     async lista_repos(username){
@@ -28,7 +42,7 @@ export const api = {
     },
     async listaIssues(owner, name, page) {
         const url = `https://api.github.com/repos/${owner}/${name}/issues?page=${page}`
-        const response = await fetch(url)
+        const response = await _fetch(url)
         return await response.json()
     }
 }
